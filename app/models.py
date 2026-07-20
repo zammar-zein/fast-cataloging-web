@@ -1,4 +1,4 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey
 from datetime import datetime, timezone
 from .db import Base
@@ -13,6 +13,7 @@ class Work(Base):
     created_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc)
     )
+    runs: Mapped[list["Run"]] = relationship(back_populates="work", order_by='Run.id')
 
 class Run(Base):
     __tablename__ = "runs"
@@ -25,3 +26,4 @@ class Run(Base):
         default=lambda: datetime.now(timezone.utc)
     )
     finished_at: Mapped[datetime | None]
+    work: Mapped["Work"] = relationship(back_populates='runs')

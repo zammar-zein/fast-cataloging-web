@@ -10,6 +10,15 @@ class RunOut(BaseModel):
     error: str | None 
     created_at: datetime 
 
+class WorkOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    isbn13: str
+    title: str | None
+    description: str | None
+    runs: list[RunOut]
+
 class WorkCreated(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

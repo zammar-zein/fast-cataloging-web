@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 import requests 
+from ..config import Settings
+
+settings = Settings()
 
 @dataclass 
 class BookMetadata:
@@ -10,9 +13,12 @@ class BookMetadata:
     source: str = "" # which service found it
 
 def fetch_google_books(isbn13: str) -> BookMetadata | None:
+    params = {"q": f"isbn:{isbn13}"}
+    if settings.google_books_api_key:
+        params["key"] = settings.google_books_api_key
     response = requests.get(
         'https://www.googleapis.com/books/v1/volumes', 
-        params={"q": f"isbn:{isbn13}"},
+        params=params,
         timeout=15
         )
     response.raise_for_status()
@@ -78,7 +84,7 @@ def fetch_open_library(isbn13: str) -> BookMetadata | None:
 
 def fetch_metadata(isbn13: str) -> BookMetadata | None:
     sources = [fetch_google_books, fetch_open_library]
-    title_only: BookMetadata | None
+    title_only: BookMetadata | None = None
     for fetch in sources:
         try:
             record = fetch(isbn13)
