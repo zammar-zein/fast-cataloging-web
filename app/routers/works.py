@@ -1,9 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, BackgroundTasks
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ..db import get_db
+from ..jobs import process_run
 from ..models import Run, Work
 from ..schemas import WorkCreated
 
@@ -15,7 +16,11 @@ class WorkCreate(BaseModel):
 
 
 @router.post("", response_model=WorkCreated)
-def create_work(payload: WorkCreate, db: Session = Depends(get_db)):
+def create_work(
+    payload: WorkCreate,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+):
     work = db.scalar(select(Work).where(Work.isbn13 == payload.isbn13))
     if work is None:
         work = Work(isbn13=payload.isbn13)
@@ -26,5 +31,7 @@ def create_work(payload: WorkCreate, db: Session = Depends(get_db)):
     db.add(run)
     db.commit()
     db.refresh(run)
+
+    background_tasks.add_task(process_run, run.id)
 
     return {"work_id": work.id, "run_id": run.id, "status": run.status}
