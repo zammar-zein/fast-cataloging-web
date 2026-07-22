@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 
 import requests 
+import time
+
 
 ASSIGN_FAST_URL = "https://fast.oclc.org/searchfast/fastsuggest"
 
@@ -11,6 +13,16 @@ class ReconcileHeading:
     facet: str 
     tier: str 
 
+FACET_INDEX = {
+    "personal": "suggest00",
+    "corporate": "suggest10",
+    "event": "suggest11",
+    "title": "suggest30",
+    "chronological": "suggest48",
+    "topical": "suggest50",
+    "geographic": "suggest51",
+    "form_genre": "suggest55",
+}
 
 TAG_TO_FACET = {
     "100": "personal",
@@ -32,8 +44,8 @@ def _clean_id(value) -> str | None:
     digits = str(value).removeprefix("fst").lstrip("0")
     return digits or None 
 
-def best_match(label: str) -> ReconcileHeading | None:
-    docs = suggest(label)
+def best_match(label: str, facet: str = "") -> ReconcileHeading | None:
+    docs = suggest(label, facet)
     if not docs:
         return None # unsearchable label 
 
@@ -58,31 +70,51 @@ def best_match(label: str) -> ReconcileHeading | None:
     return build(first, tier)
 
 
-def suggest(label: str, rows: int = 20) -> list[dict]:
-    response = requests.get(
-        ASSIGN_FAST_URL,
-        params={
-            "query": label,
-            "queryIndex": "suggestall",
-            "queryReturn": "suggestall,idroot,auth,tag,type",
-            "suggest": "autoSubject",
-            "rows": rows,
-        },
-        timeout=20
-    )
-    response.raise_for_status()
-    return response.json().get("response", {}).get("docs", [])
+def suggest(label: str, facet: str = "", rows: int = 20, attempts: int = 3) -> list[dict]:
+    index = FACET_INDEX.get(facet, "suggestall")
+    params={
+        "query": label,
+        "queryIndex": index,
+        "queryReturn": f"{index},idroot,auth,tag,type",
+        "suggest": "autoSubject",
+        "rows": rows,
+    }
+    for attempt in range(1, attempts + 1): 
+        time.sleep(0.3)
+        try:
+            response = requests.get(ASSIGN_FAST_URL, params=params, timeout=20)
+            response.raise_for_status()
+            return response.json().get("response", {}).get("docs", [])
+        except (requests.RequestException, ValueError):
+            if attempt < attempts:
+                time.sleep(1.5 * attempt)
+    return []
 
-def reconcile_label(label: str) -> ReconcileHeading | None: 
-    match = best_match(label)
+def reconcile_label(label: str, facet: str = "") -> ReconcileHeading | None: 
+    original = label 
+
+    match = best_match(label, facet)
     if match is not None: 
         return match 
+
+    if " (" in label:
+        match = best_match(label.split(" (")[0], facet)
+        if match is not None:
+            if match.label.strip().lower() == label.strip().lower():
+                match.tier = "exact"
+            return match 
     
     while "--" in label: 
         label = label.rsplit("--", 1)[0]
-        match = best_match(label) 
+        match = best_match(label, facet) 
         if match is not None: 
             match.tier = "truncated"
             return match
-    
+
+    if "--" not in original and " (" not in original:
+        match = best_match(original) 
+        if match is not None:
+            match.tier = "fuzzy"
+            return match 
+
     return None 

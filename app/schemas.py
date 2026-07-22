@@ -2,6 +2,18 @@ from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
+class HeadingOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    proposed_label: str
+    label: str | None
+    fast_id: str | None
+    facet: str
+    tier: str 
+    source_model: str 
+    position: int
+
 class RunOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -9,6 +21,7 @@ class RunOut(BaseModel):
     status: str
     error: str | None 
     created_at: datetime 
+    headings: list[HeadingOut]
 
 class WorkOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)

@@ -27,3 +27,18 @@ class Run(Base):
     )
     finished_at: Mapped[datetime | None]
     work: Mapped["Work"] = relationship(back_populates='runs')
+    headings: Mapped[list["Heading"]] = relationship(back_populates='run', order_by="Heading.id")
+
+class Heading(Base):
+    __tablename__ = "headings"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    run_id: Mapped[int] = mapped_column(ForeignKey("runs.id", ondelete="CASCADE"))
+    proposed_label: Mapped[str]
+    label: Mapped[str | None]
+    fast_id: Mapped[str | None]
+    facet: Mapped[str]
+    tier: Mapped[str]
+    source_model: Mapped[str] 
+    position: Mapped[int]
+    run: Mapped["Run"] = relationship(back_populates='headings')

@@ -29,6 +29,10 @@ build compound "Topic--Place--Form" strings.
 - At most {max_headings} headings, ordered from most to least central.
 - If the metadata is too thin to judge, return fewer headings rather than \
 guessing.
+- Use "personal" for people, including fictitious characters; "corporate" \
+for organizations.
+- Never append form subdivisions such as "--Fiction" to a heading; \
+express form only as its own form_genre heading.
 
 Book metadata:
   Title: {title}
@@ -48,7 +52,7 @@ HEADINGS_SCHEMA = {
                     },
                     "facet": {
                         "type": "string",
-                        "enum": ["topical", "geographic", "form_genre"],
+                        "enum": ["topical", "geographic", "form_genre", "personal", "corporate", "event", "chronological"],
                     },
                 },
                 "required": ["label", "facet"]
@@ -68,11 +72,11 @@ def generate_candidates(title: str, description: str | None,
     )
     result = call_claude(prompt, HEADINGS_SCHEMA, model)
     return [
-        CandidateHeading(label=h["label"], facet=h["facet"], source_model="claude")
+        CandidateHeading(label=h["label"], facet=h["facet"], source_model=model)
         for h in result.get("headings", [])
     ]
 
-def call_claude(prompt: str, schema: dict, model: str = HAIKU) -> str:
+def call_claude(prompt: str, schema: dict, model: str = HAIKU) -> dict:
     response = requests.post(
         f"{settings.huit_api_base_url}/model/{model}/invoke",
         headers={"api-key": settings.huit_api_key},
