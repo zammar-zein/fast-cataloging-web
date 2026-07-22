@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey
+from sqlalchemy import ForeignKey, UniqueConstraint
 from datetime import datetime, timezone
 from .db import Base
 
@@ -28,6 +28,7 @@ class Run(Base):
     finished_at: Mapped[datetime | None]
     work: Mapped["Work"] = relationship(back_populates='runs')
     headings: Mapped[list["Heading"]] = relationship(back_populates='run', order_by="Heading.id")
+    decisions: Mapped[list["ReviewDecision"]] = relationship(back_populates="run")
 
 class Heading(Base):
     __tablename__ = "headings"
@@ -42,3 +43,16 @@ class Heading(Base):
     source_model: Mapped[str] 
     position: Mapped[int]
     run: Mapped["Run"] = relationship(back_populates='headings')
+
+class ReviewDecision(Base):
+    __tablename__ = "review_decisions"
+    __table_args__ = (UniqueConstraint("run_id", "fast_id"),)
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    run_id: Mapped[int] = mapped_column(ForeignKey("runs.id", ondelete="CASCADE"))
+    fast_id: Mapped[str]
+    decision: Mapped[str]
+    created_at: Mapped[datetime] = mapped_column(
+        default=lambda: datetime.now(timezone.utc)
+    )
+    run: Mapped["Run"] = relationship(back_populates="decisions")

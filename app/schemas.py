@@ -38,3 +38,35 @@ class WorkCreated(BaseModel):
     work_id: int
     run_id: int
     status: str
+
+class DecisionCreate(BaseModel):
+    fast_id: str
+
+class DecisionOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int 
+    fast_id: str 
+    decision: str 
+    created_at: datetime
+
+class FinalEntry(BaseModel):
+    fast_id: str
+    label: str | None
+    facet: str
+    source_models: list[str]      # who voted for it 
+    rejected: bool                # UI renders strikethrough + undo button
+
+class ReviewScreen(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+    isbn13: str
+    title: str | None
+    description: str | None
+    run_id: int
+    status: str
+    proposals: dict[str, list[HeadingOut]]   # per model, tiers visible
+    final: list[FinalEntry]
+
+class HeadingCreate(BaseModel):
+    label: str 
+    facet: str = ""
