@@ -64,7 +64,7 @@ HEADINGS_SCHEMA = {
 
 def generate_candidates(title: str, description: str | None,
                         max_headings: int = 10,
-                        model: str = HAIKU) -> list[CandidateHeading]:
+                        model: str = OPUS) -> list[CandidateHeading]:
     prompt = PROMPT.format(
         max_headings=max_headings,
         title=title,
@@ -76,7 +76,7 @@ def generate_candidates(title: str, description: str | None,
         for h in result.get("headings", [])
     ]
 
-def call_claude(prompt: str, schema: dict, model: str = HAIKU) -> dict:
+def call_claude(prompt: str, schema: dict, model: str = OPUS) -> dict:
     response = requests.post(
         f"{settings.huit_api_base_url}/model/{model}/invoke",
         headers={"api-key": settings.huit_api_key},

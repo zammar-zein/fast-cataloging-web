@@ -17,6 +17,7 @@ def process_run(run_id: int) -> None:
             raise ValueError("No metadata found for this ISBN")
         work.title = meta.title
         work.description = meta.description
+        work.metadata_source = meta.source
         db.commit()
 
         candidates = generate_candidates(work.title, work.description)

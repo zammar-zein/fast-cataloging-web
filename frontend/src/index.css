@@ -1,0 +1,85 @@
+/* ---- design tokens ---------------------------------------------------- */
+:root {
+  --crimson: #a51c30;
+  --crimson-dark: #8a1727;
+  --ink: #1f2328;
+  --ink-soft: #57606a;
+  --paper: #f6f7f9;
+  --card: #ffffff;
+  --line: #e3e6ea;
+  --radius: 10px;
+  --shadow: 0 1px 3px rgba(31, 35, 40, 0.08);
+
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4 {
+  line-height: 1.25;
+  margin: 0 0 0.5rem;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ---- shared controls --------------------------------------------------- */
+button {
+  font: inherit;
+  border: 1px solid var(--line);
+  background: var(--card);
+  color: var(--ink);
+  border-radius: 6px;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--ink-soft);
+  background: #fafbfc;
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+button.primary {
+  background: var(--crimson);
+  border-color: var(--crimson);
+  color: #fff;
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--crimson-dark);
+  border-color: var(--crimson-dark);
+}
+
+input, select {
+  font: inherit;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 0.4rem 0.7rem;
+  background: var(--card);
+  color: var(--ink);
+}
+
+input:focus, select:focus {
+  outline: 2px solid rgba(165, 28, 48, 0.25);
+  border-color: var(--crimson);
+}

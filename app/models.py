@@ -8,8 +8,11 @@ class Work(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     isbn13: Mapped[str] = mapped_column(unique=True)
-    title: Mapped[str | None] 
+    title: Mapped[str | None]
     description: Mapped[str | None]
+    # which waterfall source supplied the metadata (e.g. "google_books",
+    # "open_library+web_search") — reviewers weigh web_search lower
+    metadata_source: Mapped[str | None]
     created_at: Mapped[datetime] = mapped_column(
         default=lambda: datetime.now(timezone.utc)
     )

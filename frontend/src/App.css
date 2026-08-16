@@ -1,0 +1,256 @@
+/* ---- app shell ---------------------------------------------------------- */
+.shell {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1.25rem 3rem;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.1rem 0;
+  border-bottom: 2px solid var(--crimson);
+  margin-bottom: 1.5rem;
+}
+
+.brand {
+  font-size: 1.35rem;
+  font-weight: 650;
+  margin: 0;
+}
+
+.brand span {
+  color: var(--crimson);
+}
+
+.tabs button {
+  border-radius: 0;
+  border: none;
+  background: none;
+  color: var(--ink-soft);
+  padding: 0.4rem 0.9rem;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px; /* sit on the topbar rule */
+}
+
+.tabs button:hover:not(:disabled) {
+  background: none;
+  color: var(--ink);
+}
+
+.tabs button:disabled {
+  /* the active tab */
+  opacity: 1;
+  color: var(--crimson);
+  border-bottom-color: var(--crimson);
+  font-weight: 600;
+}
+
+/* ---- catalog form + status ---------------------------------------------- */
+.catalog-form {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.catalog-form input {
+  flex: 1;
+  max-width: 26rem;
+  font-size: 1.05rem;
+}
+
+.status-line {
+  color: var(--ink-soft);
+  margin: 0.25rem 0;
+}
+
+.status-line.error {
+  color: var(--crimson);
+}
+
+.spinner {
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  border: 2px solid var(--line);
+  border-top-color: var(--crimson);
+  border-radius: 50%;
+  vertical-align: -0.1em;
+  margin-right: 0.4rem;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---- cards --------------------------------------------------------------- */
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.1rem 1.3rem;
+}
+
+.review-head {
+  margin: 1.25rem 0 1rem;
+}
+
+.review-head h2 {
+  margin-bottom: 0.15rem;
+}
+
+.review-head .isbn {
+  color: var(--ink-soft);
+  font-weight: 400;
+  font-size: 0.85em;
+}
+
+.review-head details {
+  color: var(--ink-soft);
+  max-width: 60rem;
+}
+
+.review-head summary {
+  cursor: pointer;
+  user-select: none;
+}
+
+.columns {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.columns > .card {
+  flex: 1 1 26rem;
+}
+
+.model-name {
+  color: var(--ink-soft);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-transform: none;
+  word-break: break-all;
+}
+
+/* ---- heading rows --------------------------------------------------------- */
+.rows li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  padding: 0.45rem 0.2rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.rows li:last-child {
+  border-bottom: none;
+}
+
+.rows .grow {
+  flex: 1;
+}
+
+.rows .muted {
+  color: var(--ink-soft);
+  font-size: 0.85em;
+}
+
+li.rejected {
+  opacity: 0.5;
+}
+
+li.rejected .label {
+  text-decoration: line-through;
+}
+
+/* ---- badges ---------------------------------------------------------------- */
+.badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  border-radius: 999px;
+  padding: 0.05rem 0.55rem;
+  white-space: nowrap;
+  background: #eef0f2;
+  color: var(--ink-soft);
+}
+
+.badge.tier-exact      { background: #e2f3e8; color: #176639; }
+.badge.tier-variant    { background: #e3edfd; color: #1a4fb3; }
+.badge.tier-truncated  { background: #fdf1cf; color: #8a6116; }
+.badge.tier-fuzzy      { background: #fde8d7; color: #ad4e10; }
+.badge.tier-no_match   { background: #fbe1e4; color: #a51c30; }
+
+.badge.status-succeeded { background: #e2f3e8; color: #176639; }
+.badge.status-failed    { background: #fbe1e4; color: #a51c30; }
+.badge.status-queued,
+.badge.status-running   { background: #e3edfd; color: #1a4fb3; }
+
+/* ---- add-heading form -------------------------------------------------------- */
+.add-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+  flex-wrap: wrap;
+}
+
+.add-form input {
+  flex: 1;
+  min-width: 10rem;
+}
+
+/* ---- history table (sheet-like) ------------------------------------------------ */
+.sheet {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.sheet th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--ink-soft);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 0.6rem;
+  border-bottom: 2px solid var(--line);
+}
+
+.sheet td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+
+.sheet tbody tr:hover {
+  background: #fafbfc;
+}
+
+.sheet td.num {
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+
+.sheet td.title-cell {
+  max-width: 24rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.9rem;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+}

@@ -39,6 +39,22 @@ class WorkCreated(BaseModel):
     run_id: int
     status: str
 
+class RunListItem(BaseModel):
+    """One row of the chronological runs table (history view)."""
+    id: int
+    status: str
+    created_at: datetime
+    work_id: int
+    isbn13: str
+    title: str | None
+
+class RunPage(BaseModel):
+    """One page of the runs table plus what the pager needs."""
+    items: list[RunListItem]
+    total: int
+    page: int
+    page_size: int
+
 class DecisionCreate(BaseModel):
     fast_id: str
 
@@ -62,6 +78,7 @@ class ReviewScreen(BaseModel):
     isbn13: str
     title: str | None
     description: str | None
+    metadata_source: str | None
     run_id: int
     status: str
     proposals: dict[str, list[HeadingOut]]   # per model, tiers visible

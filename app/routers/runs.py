@@ -1,15 +1,54 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session, selectinload
 
 from app.pipeline.reconcile import reconcile_label
 
 from ..db import get_db
 from ..models import Run, Heading, ReviewDecision
-from ..schemas import RunOut, DecisionCreate, DecisionOut, ReviewScreen, HeadingCreate
+from ..schemas import (
+    RunOut,
+    RunPage,
+    DecisionCreate,
+    DecisionOut,
+    ReviewScreen,
+    HeadingCreate,
+)
 
 router = APIRouter(prefix="/runs", tags=["runs"])
+
+@router.get("", response_model=RunPage)
+def get_runs(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(25, ge=1, le=100),
+    db: Session = Depends(get_db),
+):
+    """One page of the chronological runs table, newest first."""
+    total = db.scalar(select(func.count()).select_from(Run)) or 0
+    runs = db.scalars(
+        select(Run)
+        .options(selectinload(Run.work))
+        .order_by(Run.id.desc())
+        .offset((page - 1) * page_size)
+        .limit(page_size)
+    ).all()
+    return {
+        "items": [
+            {
+                "id": r.id,
+                "status": r.status,
+                "created_at": r.created_at,
+                "work_id": r.work_id,
+                "isbn13": r.work.isbn13,
+                "title": r.work.title,
+            }
+            for r in runs
+        ],
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+    }
 
 @router.get("/{run_id}", response_model=RunOut)
 def get_run(run_id: int, db: Session = Depends(get_db)):
@@ -48,6 +87,7 @@ def get_review_screen(run_id: int, db: Session = Depends(get_db)):
         "isbn13": work.isbn13,
         "title": work.title,
         "description": work.description,
+        "metadata_source": work.metadata_source,
         "run_id": run.id,
         "status": run.status,
         "proposals": proposals,
@@ -98,7 +138,7 @@ def delete_decision(run_id: int, fast_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail='Decision not found')
     db.delete(decision)
     db.commit()
-    return {"udone": True}
+    return {"undone": True}
 
 @router.post("/{run_id}/headings")
 def create_heading(run_id: int, payload: HeadingCreate, db: Session = Depends(get_db)):
